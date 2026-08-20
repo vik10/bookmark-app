@@ -1,15 +1,48 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, TextField, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { loginUser } from "../../api/auth";
+import { loginSchema, type LoginFormValues } from "../../schemas/authSchema";
 import "./Login.scss";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      await loginUser(data);
+      navigate("/dashboard");
+    } catch (error) {
+      setError("root", {
+        message: error instanceof Error ? error.message : "Login failed",
+      });
+    }
+  };
+
   return (
-    <div className="login-container">
+    <form
+      className="login-container"
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+    >
       <Typography variant="h2">Login Page</Typography>
       <TextField
-        label="Username"
+        label="Email"
         variant="outlined"
         fullWidth
         margin="normal"
+        {...register("email")}
+        error={!!errors.email}
+        helperText={errors.email?.message}
       />
       <TextField
         label="Password"
@@ -17,14 +50,25 @@ const Login = () => {
         fullWidth
         margin="normal"
         type="password"
+        {...register("password")}
+        error={!!errors.password}
+        helperText={errors.password?.message}
       />
-      <Button variant="contained" color="primary">
-        Login
+      {errors.root?.message && (
+        <Typography color="error">{errors.root.message}</Typography>
+      )}
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Logging in..." : "Login"}
       </Button>
       <Typography variant="body1">
         Don't have an account? <a href="/signup">Sign Up</a>
       </Typography>
-    </div>
+    </form>
   );
 };
 

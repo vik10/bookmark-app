@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import crypto from "node:crypto";
 import pool from "../config/database.js";
+import { error } from "node:console";
 
 export const testDatabaseConnection = async (
   req: Request,
@@ -29,13 +30,6 @@ export const signupUser = async (
 ): Promise<void> => {
   const { firstName, lastName, name, password, email } = req.body;
   const fullName = [firstName, lastName, name].filter(Boolean).join(" ").trim();
-
-  console.log("Signup request received:", {
-    email,
-    password,
-    fullName,
-    body: req.body,
-  });
 
   if (!fullName || !password || !email) {
     res.status(400).json({
@@ -78,6 +72,64 @@ export const signupUser = async (
     res.status(500).json({
       status: "error",
       message: "User signup failed",
+      error: (error as Error).message,
+    });
+  }
+};
+
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({
+      status: "error",
+      message: "email and password are requried",
+    });
+    return;
+  }
+
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE email=$1", [
+      email,
+    ]);
+
+    if (result.rows.length === 0) {
+      res.status(401).json({
+        status: "error",
+        message: "invalid email or password.",
+      });
+      return;
+    }
+    const user = result.rows[0];
+
+    const passwordHash = crypto
+      .createHash("sha256")
+      .update(password)
+      .digest("hex");
+
+    const isValidPassword = passwordHash === user.password_hash;
+
+    if (!isValidPassword) {
+      res.status(401).json({
+        status: "error",
+        message: "invalid email or password--pass--",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: "sucess",
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "user login failed",
       error: (error as Error).message,
     });
   }
