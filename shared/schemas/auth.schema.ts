@@ -14,8 +14,6 @@ export const signupSchema = z.object({
     .min(6, "Password must be at least 6 characters"),
 });
 
-export type SignupFormValues = z.infer<typeof signupSchema>;
-
 export const loginSchema = z.object({
   email: z
     .string()
@@ -24,5 +22,3 @@ export const loginSchema = z.object({
     .email("Enter a valid email"),
   password: z.string().min(1, "Password is required"),
 });
-
-export type LoginFormValues = z.infer<typeof loginSchema>;

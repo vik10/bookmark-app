@@ -1,11 +1,5 @@
+import type { SignupData } from "../../../shared";
 import { apiRequest } from "./axiosClient";
-
-export type SignupPayload = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
 
 export type LoginPayload = {
   email: string;
@@ -18,16 +12,16 @@ export type AuthResponse = {
   user?: unknown;
 };
 
-export const signupUser = (payload: SignupPayload) =>
+export const signupUser = (payload: SignupData) =>
   apiRequest<AuthResponse>({
     method: "POST",
-    url: "/signup",
+    url: "/auth/signup",
     data: payload,
   });
 
 export const loginUser = (payload: LoginPayload) =>
   apiRequest<AuthResponse>({
     method: "POST",
-    url: "/login",
+    url: "/auth/login",
     data: payload,
   });
