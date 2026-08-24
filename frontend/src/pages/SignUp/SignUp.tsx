@@ -2,19 +2,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, TextField, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { signupUser } from "../../api/auth";
-import { signupSchema, type SignupFormValues } from "../../schemas/authSchema";
 import "./SignUp.scss";
+import { signupSchema, type SignupData } from "../../../../shared";
 
 const SignUp = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupFormValues>({
+  } = useForm<SignupData>({
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = async (data: SignupFormValues) => {
+  const onSubmit = async (data: SignupData) => {
     try {
       const response = await signupUser({
         firstName: data.firstName,
