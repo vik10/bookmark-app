@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { createUser, findUserByEmail } from "../repositories";
+import { createAppError } from "../utils";
 
 export const signupUser = async (
   fullName: string,
@@ -14,7 +15,7 @@ export const signupUser = async (
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
-    throw new Error("EMAIL_EXISTS");
+    throw createAppError("User with this email already exists", 409);
   }
 
   const user = await createUser(fullName, email, passwordHash);
@@ -26,7 +27,7 @@ export const loginUser = async (email: string, password: string) => {
   const existingUser = await findUserByEmail(email);
 
   if (!existingUser) {
-    throw new Error("EMAIL_NOT_EXISTS");
+    throw createAppError("Invalid email or password --email-test--", 401);
   }
 
   const passwordHash = crypto
@@ -37,7 +38,7 @@ export const loginUser = async (email: string, password: string) => {
   const isValidPassword = passwordHash === existingUser.password_hash;
 
   if (!isValidPassword) {
-    throw new Error("PASSWORD_INVALID");
+    throw createAppError("Invalid email or password --paswrd-test--", 401);
   }
 
   return {
