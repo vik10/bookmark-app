@@ -4,6 +4,7 @@ import bookmarkRoutes from "./routes/bookmark.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import pinoHttp from "pino-http";
 import logger from "./config/logger";
+import { errorMiddleware } from "./middleware/index.js";
 
 dotenv.config();
 
@@ -39,7 +40,10 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 
+// Error middleware should come in the end of all routes
+app.use(errorMiddleware);
+
 // Start server
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  logger.info(`Server is running at http://localhost:${port}`);
 });
