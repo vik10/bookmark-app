@@ -3,8 +3,8 @@ import { Button, TextField, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { loginUser } from "../../api/auth";
-import { loginSchema, type LoginFormValues } from "../../schemas/authSchema";
 import "./Login.scss";
+import { loginSchema, type LoginData } from "../../../../shared";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,11 +13,11 @@ const Login = () => {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
+  } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginData) => {
     try {
       await loginUser(data);
       navigate("/dashboard");
