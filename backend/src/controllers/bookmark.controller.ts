@@ -1,6 +1,5 @@
-import pool from "../config/db";
 import { Request, Response } from "express";
-import logger from "../config/logger";
+import { logger, pool } from "../config";
 
 export const testDatabaseConnection = async (
   _req: Request,

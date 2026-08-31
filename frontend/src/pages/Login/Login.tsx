@@ -2,9 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, TextField, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { loginUser } from "../../api/auth";
 import "./Login.scss";
 import { loginSchema, type LoginData } from "../../../../shared";
+import { useLoginUserMutation } from "../../api/auth-api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const Login = () => {
   } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
   });
+  const [loginUser, { isLoading }] = useLoginUserMutation();
 
   const onSubmit = async (data: LoginData) => {
     try {
@@ -61,6 +62,7 @@ const Login = () => {
         type="submit"
         variant="contained"
         color="primary"
+        loading={isLoading}
         disabled={isSubmitting}
       >
         {isSubmitting ? "Logging in..." : "Login"}

@@ -3,38 +3,30 @@ import dotenv from "dotenv";
 import bookmarkRoutes from "./routes/bookmark.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import pinoHttp from "pino-http";
-import logger from "./config/logger";
 import { errorMiddleware } from "./middleware/index.js";
+import { logger, sessionMiddleware } from "./config";
+import cors from "cors";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
+// Request logger
 app.use(
   pinoHttp({
     logger,
   }),
 );
+
+// Parse JSON request bodies
 app.use(express.json());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-  );
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
+//CORS
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
-  next();
-});
+// create sessions before routes
+app.use(sessionMiddleware);
 
 // Routes
 app.use("/api/auth", authRoutes);

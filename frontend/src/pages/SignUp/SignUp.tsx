@@ -1,11 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { signupUser } from "../../api/auth";
-import "./SignUp.scss";
+import { useNavigate } from "react-router";
+import { useSignupUserMutation } from "../../api/auth-api";
+import { AppSnackbar } from "../../components";
 import { signupSchema, type SignupData } from "../../../../shared";
+import "./SignUp.scss";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+  const [toastOpen, setToastOpen] = useState(false);
+  const [signupUser] = useSignupUserMutation();
   const {
     register,
     handleSubmit,
@@ -16,15 +22,15 @@ const SignUp = () => {
 
   const onSubmit = async (data: SignupData) => {
     try {
-      const response = await signupUser({
+      await signupUser({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
       });
 
-      console.log("Signup success:", response);
-      alert(response.message);
+      setToastOpen(true);
+      navigate("/login");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Signup failed";
 
@@ -89,6 +95,13 @@ const SignUp = () => {
       <Typography variant="body1">
         Already have an account? <a href="/login">Login</a>
       </Typography>
+
+      <AppSnackbar
+        open={toastOpen}
+        onClose={() => setToastOpen(false)}
+        message="Signup successful! Login now..."
+        severity="success"
+      />
     </form>
   );
 };
