@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "connect-pg-simple": "^10.0.0",
+    "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.21.1",
+    "express-session": "^1.19.0",
     "pg": "^8.23.0",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
@@ -20,7 +23,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/connect-pg-simple": "^7.0.3",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/express-session": "^1.19.0",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.11.8",
     "@types/pino-http": "^5.8.4",
