@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { loginUser, signupUser } from "../services";
 import { createAppError } from "../utils";
+import { findUserById } from "../repositories";
 
 export const signup = async (req: Request, res: Response) => {
   const { firstName, lastName, password, email } = req.body;
@@ -28,11 +29,14 @@ export const logout = (req: Request, res: Response) => {
   });
 };
 
-export const getCurrentUser = (_req: Request, res: Response) => {
+export const getCurrentUser = async (req: Request, res: Response) => {
+  const userId = req.session.userId;
+  const user = await findUserById(Number(userId));
   res.status(200).json({
     message: "User authenticated",
     data: {
       isAuthenticated: true,
+      user,
     },
   });
 };
