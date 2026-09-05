@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
 import { logger, pool } from "../config";
+import {
+  createBookmarkService,
+  getBookmarksByUserIdService,
+} from "../services";
 
 export const testDatabaseConnection = async (
   _req: Request,
@@ -21,4 +25,18 @@ export const testDatabaseConnection = async (
       error: (error as Error).message,
     });
   }
+};
+
+export const createBookmark = async (req: Request, res: Response) => {
+  const result = await createBookmarkService({
+    ...req.body,
+    userId: req.session.userId,
+  });
+  res.status(201).json(result);
+};
+
+export const getBookmarksByUserId = async (req: Request, res: Response) => {
+  const userId = req.session.userId;
+  const result = await getBookmarksByUserIdService(Number(userId), req.query);
+  res.status(200).json(result);
 };

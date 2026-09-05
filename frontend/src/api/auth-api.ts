@@ -1,28 +1,20 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { axiosBaseQuery } from "./axios-base-query";
+import { api } from "./api";
 import type { ApiResponse } from "../../../shared";
 
-export const authApi = createApi({
-  reducerPath: "authApi",
-
-  baseQuery: axiosBaseQuery({
-    baseUrl: "/auth",
-  }),
-
-  tagTypes: ["Auth"],
-
+export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     signupUser: builder.mutation({
       query: (data) => ({
-        url: "/signup",
+        url: "/auth/signup",
         method: "POST",
         data,
       }),
+      invalidatesTags: ["Auth"],
     }),
 
     loginUser: builder.mutation({
       query: (data) => ({
-        url: "/login",
+        url: "/auth/login",
         method: "POST",
         data,
       }),
@@ -31,17 +23,21 @@ export const authApi = createApi({
 
     logoutUser: builder.mutation({
       query: () => ({
-        url: "/logout",
+        url: "/auth/logout",
         method: "POST",
       }),
+      invalidatesTags: ["Auth", "Bookmarks"],
     }),
 
     authenticateUser: builder.query<
-      ApiResponse<{ isAuthenticated: boolean }>,
+      ApiResponse<{
+        isAuthenticated: boolean;
+        user?: { id: number; name: string; email: string };
+      }>,
       void
     >({
       query: () => ({
-        url: "/me",
+        url: "/auth/me",
         method: "GET",
       }),
       providesTags: ["Auth"],
