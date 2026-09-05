@@ -16,8 +16,8 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  bookmarkCreateSchema,
-  type bookmarkCreateType,
+  createBookmarkSchema,
+  type createBookmarkType,
 } from "../../../../shared";
 import { CommonDrawer } from "../../components";
 import {
@@ -38,20 +38,19 @@ const Dashboard = () => {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<bookmarkCreateType>({
-    resolver: zodResolver(bookmarkCreateSchema),
+  } = useForm<createBookmarkType>({
+    resolver: zodResolver(createBookmarkSchema),
   });
 
   const [createBookmark] = useCreateBookmarkMutation();
   const { data, isLoading, isError } = useGetBookmarksQuery({
-    searchQuery,
-    sortBy,
-    sortOrder,
+    search: searchQuery,
+    sort: `${sortBy}:${sortOrder}`,
   });
 
   const bookmarks = data?.data ?? [];
 
-  const onSubmit = async (data: bookmarkCreateType) => {
+  const onSubmit = async (data: createBookmarkType) => {
     try {
       await createBookmark(data).unwrap();
       reset();

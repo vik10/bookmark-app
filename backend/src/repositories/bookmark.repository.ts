@@ -1,8 +1,8 @@
-import { bookmarkCreateType, queryParamsType } from "../../../shared";
+import { createBookmarkType, queryParamsType } from "../../../shared";
 import { pool } from "../config";
 
-export const creatBookarkInTable = async (
-  data: bookmarkCreateType & { userId: string },
+export const insertBookmark = async (
+  data: createBookmarkType & { userId: string },
 ) => {
   const { title, url, description, userId } = data;
   const result = await pool.query(
@@ -16,7 +16,9 @@ export const getBookmarksByUserId = async (
   userId: number,
   queryParams: queryParamsType,
 ) => {
-  const { sortBy = "", sortOrder = "", searchQuery = "" } = queryParams;
+  const { sort = "", search = "" } = queryParams;
+  const [sortBy, sortOrder] = sort.split(":");
+
   const allowedSortColumns: Record<string, string> = {
     title: "title",
     created_at: "created_at",
@@ -26,7 +28,7 @@ export const getBookmarksByUserId = async (
 
   const sortColumn = allowedSortColumns[sortBy] || "created_at";
   const order = sortOrder.toLowerCase() === "asc" ? "ASC" : "DESC";
-  const searchPattern = `%${searchQuery.trim().toLowerCase()}%`;
+  const searchPattern = `%${search.trim().toLowerCase()}%`;
 
   const query = `SELECT * FROM bookmarks
                   WHERE LOWER(title) LIKE $2 

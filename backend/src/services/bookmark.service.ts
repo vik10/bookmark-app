@@ -1,17 +1,17 @@
-import { bookmarkCreateType, queryParamsType } from "../../../shared";
-import { creatBookarkInTable, getBookmarksByUserId } from "../repositories";
+import { createBookmarkType, queryParamsType } from "../../../shared";
+import { insertBookmark, getBookmarksByUserId } from "../repositories";
 
-export const createBookmark = async (
-  data: bookmarkCreateType & { userId: string },
+export const createBookmarkService = async (
+  data: createBookmarkType & { userId: string },
 ) => {
-  const bookmark = await creatBookarkInTable(data);
+  const bookmark = await insertBookmark(data);
   return {
     message: "bookmark created successfully",
     data: { id: bookmark.id },
   };
 };
 
-export const handleGetBookmarksByUserId = async (
+export const getBookmarksByUserIdService = async (
   userId: number,
   query: queryParamsType,
 ) => {

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { bookmarkCreateType } from "../../../shared";
+import type { createBookmarkType, queryParamsType } from "../../../shared";
 
 type Bookmark = {
   id: number;
@@ -14,26 +14,20 @@ type BookmarkListResponse = {
   data: Bookmark[];
 };
 
-type BookmarkQueryParams = {
-  sortBy?: "title" | "created_at" | "url" | "id";
-  sortOrder?: "asc" | "desc";
-  searchQuery?: string;
-};
-
 export const bookmarkApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createBookmark: builder.mutation<
       { data: { id: number } },
-      bookmarkCreateType
+      createBookmarkType
     >({
       query: (data) => ({
-        url: "/bookmarks/create-bookmark",
+        url: "/bookmarks",
         method: "POST",
         data,
       }),
       invalidatesTags: ["Bookmarks"],
     }),
-    getBookmarks: builder.query<BookmarkListResponse, BookmarkQueryParams>({
+    getBookmarks: builder.query<BookmarkListResponse, queryParamsType>({
       query: (params = {}) => ({
         url: "/bookmarks",
         method: "GET",
