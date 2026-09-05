@@ -21,6 +21,8 @@ export default tseslint.config(
     rules: {
       "rest/route-resource-naming": "error",
       "rest/query-parameter-names": "error",
+      "rest/identifier-naming": "error",
+      "rest/file-naming": "error",
     },
   },
 );

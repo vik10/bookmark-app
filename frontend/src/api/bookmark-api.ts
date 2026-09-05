@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { createBookmarkType, queryParamsType } from "../../../shared";
+import type { CreateBookmarkType, QueryParamsType } from "../../../shared";
 
 type Bookmark = {
   id: number;
@@ -18,7 +18,7 @@ export const bookmarkApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createBookmark: builder.mutation<
       { data: { id: number } },
-      createBookmarkType
+      CreateBookmarkType
     >({
       query: (data) => ({
         url: "/bookmarks",
@@ -27,7 +27,7 @@ export const bookmarkApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Bookmarks"],
     }),
-    getBookmarks: builder.query<BookmarkListResponse, queryParamsType>({
+    getBookmarks: builder.query<BookmarkListResponse, QueryParamsType>({
       query: (params = {}) => ({
         url: "/bookmarks",
         method: "GET",

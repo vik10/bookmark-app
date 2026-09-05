@@ -1,8 +1,8 @@
-import { createBookmarkType, queryParamsType } from "../../../shared";
+import { CreateBookmarkType, QueryParamsType } from "../../../shared";
 import { pool } from "../config";
 
 export const insertBookmark = async (
-  data: createBookmarkType & { userId: string },
+  data: CreateBookmarkType & { userId: string },
 ) => {
   const { title, url, description, userId } = data;
   const result = await pool.query(
@@ -14,7 +14,7 @@ export const insertBookmark = async (
 
 export const getBookmarksByUserId = async (
   userId: number,
-  queryParams: queryParamsType,
+  queryParams: QueryParamsType,
 ) => {
   const { sort = "", search = "" } = queryParams;
   const [sortBy, sortOrder] = sort.split(":");

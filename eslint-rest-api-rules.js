@@ -57,6 +57,14 @@ const containsActionWord = (segment) => {
   return words.some((word) => actionWords.has(word));
 };
 
+const isPascalCase = (name) => /^[A-Z][A-Za-z0-9]*$/.test(name);
+const isCamelCase = (name) => /^[a-z][A-Za-z0-9]*$/.test(name);
+const isConstantCase = (name) => /^[A-Z][A-Z0-9_]*$/.test(name);
+
+const getIdentifierName = (node) => {
+  return node?.type === "Identifier" ? node.name : null;
+};
+
 /* -------------------------------------------------------------------------- */
 /* Rule 1: Route Resource Naming                                              */
 /* -------------------------------------------------------------------------- */
@@ -309,6 +317,157 @@ const consistentErrorResponse = {
 };
 
 /* -------------------------------------------------------------------------- */
+/* Rule 4: Identifier Naming                                                  */
+/* -------------------------------------------------------------------------- */
+
+const identifierNaming = {
+  meta: {
+    type: "suggestion",
+    docs: {
+      description:
+        "Enforce PascalCase types, camelCase functions and variables, and uppercase constants.",
+    },
+    schema: [],
+    messages: {
+      typeName: "Type and interface names must use PascalCase: '{{name}}'.",
+      functionName: "Function names must use camelCase: '{{name}}'.",
+      variableName:
+        "Variable and parameter names must use camelCase: '{{name}}'.",
+      constantName:
+        "Constants with immutable values should use UPPER_SNAKE_CASE: '{{name}}'.",
+    },
+  },
+
+  create(context) {
+    const checkVariableName = (node) => {
+      const name = getIdentifierName(node.id);
+
+      if (!name || name.startsWith("_")) return;
+
+      const isFunctionValue =
+        node.init?.type === "ArrowFunctionExpression" ||
+        node.init?.type === "FunctionExpression";
+      const isConstructorFactory =
+        node.init?.type === "CallExpression" && /^[A-Z]/.test(name);
+
+      if (isFunctionValue && !isCamelCase(name)) {
+        context.report({
+          node: node.id,
+          messageId: "functionName",
+          data: { name },
+        });
+        return;
+      }
+
+      if (
+        !isFunctionValue &&
+        !isConstructorFactory &&
+        !isCamelCase(name) &&
+        !isConstantCase(name)
+      ) {
+        context.report({
+          node: node.id,
+          messageId: "variableName",
+          data: { name },
+        });
+      }
+    };
+
+    return {
+      TSInterfaceDeclaration(node) {
+        const name = getIdentifierName(node.id);
+
+        if (name && !isPascalCase(name)) {
+          context.report({
+            node: node.id,
+            messageId: "typeName",
+            data: { name },
+          });
+        }
+      },
+
+      TSTypeAliasDeclaration(node) {
+        const name = getIdentifierName(node.id);
+
+        if (name && !isPascalCase(name)) {
+          context.report({
+            node: node.id,
+            messageId: "typeName",
+            data: { name },
+          });
+        }
+      },
+
+      FunctionDeclaration(node) {
+        const name = getIdentifierName(node.id);
+
+        if (name && !isCamelCase(name)) {
+          context.report({
+            node: node.id,
+            messageId: "functionName",
+            data: { name },
+          });
+        }
+      },
+
+      VariableDeclarator: checkVariableName,
+
+      Parameter(node) {
+        const name = getIdentifierName(node);
+
+        if (name && !name.startsWith("_") && !isCamelCase(name)) {
+          context.report({
+            node,
+            messageId: "variableName",
+            data: { name },
+          });
+        }
+      },
+    };
+  },
+};
+
+/* -------------------------------------------------------------------------- */
+/* Rule 5: File Naming                                                        */
+/* -------------------------------------------------------------------------- */
+
+const fileNaming = {
+  meta: {
+    type: "suggestion",
+    docs: {
+      description: "Enforce kebab-case names for backend source files.",
+    },
+    schema: [],
+    messages: {
+      fileName:
+        "Backend source filenames must use lowercase kebab-case: '{{name}}'.",
+    },
+  },
+
+  create(context) {
+    const fileName = context.filename;
+    const baseName = fileName.split(/[\\/]/).pop() || "";
+    const nameWithoutTypes = baseName.replace(/\.d?\.(?:ts|tsx|js|jsx)$/, "");
+
+    if (
+      nameWithoutTypes &&
+      nameWithoutTypes !== "index" &&
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)*$/.test(
+        nameWithoutTypes,
+      )
+    ) {
+      context.report({
+        node: context.sourceCode.ast,
+        messageId: "fileName",
+        data: { name: baseName },
+      });
+    }
+
+    return {};
+  },
+};
+
+/* -------------------------------------------------------------------------- */
 /* Export Rules                                                               */
 /* -------------------------------------------------------------------------- */
 
@@ -316,4 +475,6 @@ export const restApiRules = {
   "route-resource-naming": routeResourceNaming,
   "query-parameter-names": restQueryParameterNames,
   "consistent-error-response": consistentErrorResponse,
+  "identifier-naming": identifierNaming,
+  "file-naming": fileNaming,
 };

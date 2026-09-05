@@ -1,8 +1,8 @@
-import { createBookmarkType, queryParamsType } from "../../../shared";
+import { CreateBookmarkType, QueryParamsType } from "../../../shared";
 import { insertBookmark, getBookmarksByUserId } from "../repositories";
 
 export const createBookmarkService = async (
-  data: createBookmarkType & { userId: string },
+  data: CreateBookmarkType & { userId: string },
 ) => {
   const bookmark = await insertBookmark(data);
   return {
@@ -13,7 +13,7 @@ export const createBookmarkService = async (
 
 export const getBookmarksByUserIdService = async (
   userId: number,
-  query: queryParamsType,
+  query: QueryParamsType,
 ) => {
   const result = await getBookmarksByUserId(userId, query);
   return {

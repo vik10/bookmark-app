@@ -1,9 +1,9 @@
 import z from "zod";
 import { createBookmarkSchema } from "../schemas";
 
-export type createBookmarkType = z.infer<typeof createBookmarkSchema>;
+export type CreateBookmarkType = z.infer<typeof createBookmarkSchema>;
 
-export interface queryParamsType {
+export interface QueryParamsType {
   sort?: string;
   search?: string;
 }
